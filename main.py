@@ -3,7 +3,7 @@ import time
 from datetime import date
 
 import dbhandler
-import window
+import window_outdated
 
 threshold = 10 #IMPORT FROM CONFIG
 
@@ -12,7 +12,7 @@ def window_loop(so_far, limit):
         time.sleep(limit - so_far)
         
     while True:
-        response = window.popup()
+        response = window_outdated.popup()
         if response == -1:
             os.system('shutdown -s -t 0')
         elif response == 0:
