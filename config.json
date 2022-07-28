@@ -1,4 +1,4 @@
 {
-    "remind" : false,
+    "remind" : true,
     "threshold" : 120
 }
