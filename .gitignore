@@ -1,2 +1,3 @@
 .venv/
-db.sql
+__pycache__/
+PC-TIMER-DB.sql

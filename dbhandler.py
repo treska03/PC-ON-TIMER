@@ -4,7 +4,7 @@ import sqlite3
 class Days:
     
     def __init__(self):
-        self.connection = sqlite3.connect("db.sql")
+        self.connection = sqlite3.connect("PC-TIMER-DB.sql")
         self.cursor = self.connection.cursor()
         self.create_table()
     
