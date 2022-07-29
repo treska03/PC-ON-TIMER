@@ -11,23 +11,25 @@ from utils import DataReader, TimeHandler
 remind, threshold = DataReader.get_data("config.json", "remind", "threshold") 
 
 
-def prepare_and_return_time_spent_before(today):
-    INSTANCE = dbhandler.Days()
+def prepare_db(INSTANCE, today):
     INSTANCE.create_row(today)
     
+
+def get_time_spent(INSTANCE, today):
     INSTANCE.cursor.execute("SELECT time_spent FROM Days WHERE date = :date", {"date" : today})
     time_spent_before_this_activation = INSTANCE.cursor.fetchone()[0]
-    del INSTANCE
     return time_spent_before_this_activation
 
 
 def window_loop(so_far, limit):
     if limit > so_far:
         time.sleep(limit - so_far)
-        
+    
+    INSTANCE = dbhandler.Days()
     while True:
         response = []
-        hours, minutes, seconds = TimeHandler.unpack_seconds(so_far)
+        today = date.today().strftime("%d/%m/%Y")
+        hours, minutes, seconds = TimeHandler.unpack_seconds(get_time_spent(INSTANCE, today))
         window.popup(response, hours, minutes, seconds)
         response = response[0]
 
@@ -62,7 +64,12 @@ def db_updater_loop(before_last_activation_spent : int, on_day : str, turn_on_ti
 def main():
     today = date.today().strftime("%d/%m/%Y")
     turn_on_timestamp = time.time()
-    time_spent_before_this_activation = prepare_and_return_time_spent_before(today)
+    
+    INSTANCE = dbhandler.Days()
+    prepare_db(INSTANCE, today)
+    time_spent_before_this_activation = get_time_spent(INSTANCE, today)
+    
+    del INSTANCE
 
     if not remind:
         db_updater_loop(time_spent_before_this_activation, today, turn_on_timestamp)
