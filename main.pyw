@@ -11,10 +11,6 @@ from utils import DataReader, TimeHandler
 remind, threshold = DataReader.get_data("config.json", "remind", "threshold") 
 
 
-def prepare_db(INSTANCE, today):
-    INSTANCE.create_row(today)
-    
-
 def get_time_spent(INSTANCE, today):
     INSTANCE.cursor.execute("SELECT time_spent FROM Days WHERE date = :date", {"date" : today})
     time_spent_before_this_activation = INSTANCE.cursor.fetchone()[0]
@@ -66,7 +62,7 @@ def main():
     turn_on_timestamp = time.time()
     
     INSTANCE = dbhandler.Days()
-    prepare_db(INSTANCE, today)
+    INSTANCE.create_row(today)
     time_spent_before_this_activation = get_time_spent(INSTANCE, today)
     
     del INSTANCE
