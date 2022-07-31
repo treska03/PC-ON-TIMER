@@ -5,10 +5,10 @@ from datetime import date
 
 import dbhandler
 import window
-from utils import DataReader, TimeHandler
+from utils import DataReader, PlaySound, TimeHandler
 
 #Enable window to pop up when threshold is reached
-remind, threshold = DataReader.get_data("config.json", "remind", "threshold") 
+remind, sound, threshold = DataReader.get_data("config.json", "remind", "sound", "threshold") 
 
 
 def get_time_spent(INSTANCE, today):
@@ -26,10 +26,14 @@ def window_loop(so_far, limit):
         response = []
         today = date.today().strftime("%d/%m/%Y")
         hours, minutes, seconds = TimeHandler.unpack_seconds(get_time_spent(INSTANCE, today))
+
+        if sound:
+            player = threading.Thread(target=PlaySound.make_sound)
+            player.start()
+            
         window.popup(response, hours, minutes, seconds)
         response = response[0]
 
-        print(f'Sleeping for {response} minutes')
         if response == -2:
             os.system('shutdown -s -t 0')
         elif response == -1:
@@ -50,7 +54,6 @@ def db_updater_loop(before_last_activation_spent : int, on_day : str, turn_on_ti
         elapsed = round(before_last_activation_spent + time.time() - turn_on_timestamp, 0)
         INSTANCE.update(today, "time_spent", elapsed)
         INSTANCE.connection.commit()
-        print("+5")
         
         time.sleep(5)
 
@@ -64,12 +67,13 @@ def main():
     INSTANCE = dbhandler.Days()
     INSTANCE.create_row(today)
     time_spent_before_this_activation = get_time_spent(INSTANCE, today)
-    
+    INSTANCE.connection.commit()
+
     del INSTANCE
 
     if not remind:
         db_updater_loop(time_spent_before_this_activation, today, turn_on_timestamp)
-        exit()
+        return
 
     process1 = threading.Thread(target=db_updater_loop, args=(time_spent_before_this_activation, today, turn_on_timestamp))
     process1.start()
