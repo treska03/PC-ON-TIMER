@@ -46,8 +46,3 @@ def popup(vals, hours, minutes, seconds):
 
    root.protocol("WM_DELETE_WINDOW", lambda: on_closing(1))
    root.mainloop()
-
-if __name__ == "__main__":
-   random_list = []
-   print(popup(random_list, 5, 5,0))
-   print(random_list)

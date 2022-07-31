@@ -1,5 +1,5 @@
 {
-    "remind" : false,
+    "remind" : true,
     "sound" : true,
     "threshold" : 120
 }

@@ -11,12 +11,6 @@ from utils import DataReader, PlaySound, TimeHandler
 remind, sound, threshold = DataReader.get_data("config.json", "remind", "sound", "threshold") 
 
 
-def get_time_spent(INSTANCE, today):
-    INSTANCE.cursor.execute("SELECT time_spent FROM Days WHERE date = :date", {"date" : today})
-    time_spent_before_this_activation = INSTANCE.cursor.fetchone()[0]
-    return time_spent_before_this_activation
-
-
 def window_loop(so_far, limit):
     if limit > so_far:
         time.sleep(limit - so_far)
@@ -25,7 +19,7 @@ def window_loop(so_far, limit):
     while True:
         response = []
         today = date.today().strftime("%d/%m/%Y")
-        hours, minutes, seconds = TimeHandler.unpack_seconds(get_time_spent(INSTANCE, today))
+        hours, minutes, seconds = TimeHandler.unpack_seconds(INSTANCE.get_time_spent(today))
 
         if sound:
             player = threading.Thread(target=PlaySound.make_sound)
@@ -58,15 +52,14 @@ def db_updater_loop(before_last_activation_spent : int, on_day : str, turn_on_ti
         time.sleep(5)
 
 
-
-
 def main():
     today = date.today().strftime("%d/%m/%Y")
     turn_on_timestamp = time.time()
     
     INSTANCE = dbhandler.Days()
-    INSTANCE.create_row(today)
-    time_spent_before_this_activation = get_time_spent(INSTANCE, today)
+    INSTANCE.create_table()
+    INSTANCE.fill_missing_days(today)
+    time_spent_before_this_activation = INSTANCE.get_time_spent(today)
     INSTANCE.connection.commit()
 
     del INSTANCE
