@@ -13,10 +13,8 @@ class TimeHandler:
     @staticmethod
     def unpack_seconds(seconds):
         seconds = int(seconds)
-        hours = seconds // 3600
-        seconds = seconds % 3600
-        minutes = seconds // 60
-        seconds = seconds % 60
+        hours, seconds = divmod(seconds, 3600)
+        minutes, seconds = divmod(seconds, 60)
         return hours, minutes, seconds
     
     @staticmethod
@@ -49,5 +47,3 @@ class PlaySound:
             winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
         elif system == "Darwin" or system == "Linux":
             os.system(f'play -nq -t alsa synth 1 sine 440')
-
-
