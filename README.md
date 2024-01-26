@@ -16,9 +16,3 @@ For timer to turn ON automatically:
 1) Open command prompt
 2) Type shell:startup and enter
 3) Add a shortcut to main.pyw
-
--Linux:
-1) Press ctrl+alt+T
-2) sudo cp -i /path/to/script/main.pyw /bin
-3) sudo crontab -e
-4) @reboot python /bin/main.pyw &
